@@ -3,7 +3,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from openerp import api, models, fields
-from openerp.tools.safe_eval import safe_eval
 
 
 class StockConfig(models.TransientModel):
@@ -52,10 +51,9 @@ class StockConfig(models.TransientModel):
     def get_default_stock_available_mrp_based_on(self, fields):
         res = {}
         icp = self.env['ir.config_parameter']
-        res['stock_available_mrp_based_on'] = safe_eval(
-            icp.get_param('stock_available_mrp_based_on', 'False'))
-        if not res['stock_available_mrp_based_on']:
-            res['stock_available_mrp_based_on'] = 'qty_available'
+        res['stock_available_mrp_based_on'] = icp.get_param(
+            'stock_available_mrp_based_on', 'qty_available'
+        )
         return res
 
     @api.multi
@@ -63,4 +61,4 @@ class StockConfig(models.TransientModel):
         if self.stock_available_mrp_based_on:
             icp = self.env['ir.config_parameter']
             icp.set_param('stock_available_mrp_based_on',
-                          repr(self.stock_available_mrp_based_on))
+                          self.stock_available_mrp_based_on)
